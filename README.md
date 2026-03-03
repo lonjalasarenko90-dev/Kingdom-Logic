@@ -20,7 +20,10 @@ Built as a single HTML artifact, it runs fully offline and can be deployed insta
 
 ## 🚀 Live Demo
 
-After enabling GitHub Pages:
+Play it here:
+
+https://lonjalasarenko90-dev.github.io/Kingdom-Logic/
+
 ---
 
 ## 🛠 Tech
@@ -35,5 +38,5 @@ After enabling GitHub Pages:
 
 ## Philosophy
 
-Not a game about winning.
+Not a game about winning.  
 A game about becoming clearer.
