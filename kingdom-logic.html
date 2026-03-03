@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Kingdom Logic</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:#06080d;color:#d4e4f7;font-family:Georgia,serif;font-size:16px}
+.wrap{max-width:700px;margin:0 auto;padding:18px 14px 60px}
+.logo{font-family:'Trebuchet MS',Arial,sans-serif;font-size:26px;font-weight:900;background:linear-gradient(135deg,#4af0b0,#60b0f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-sub{color:#5a7a9a;font-size:13px;font-style:italic;margin-top:4px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:20px}
+.hud{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.chip{background:#0c1018;border:1px solid #1a2535;border-radius:10px;padding:10px 8px;text-align:center}
+.chip-label{font-family:'Trebuchet MS',Arial,sans-serif;font-size:9px;letter-spacing:1.5px;color:#5a7a9a;text-transform:uppercase;margin-bottom:2px}
+.chip-val{font-family:'Trebuchet MS',Arial,sans-serif;font-size:22px;font-weight:900}
+.cv-l{color:#60b0f0}.cv-h{color:#f07080}.cv-c{color:#4af0b0}.cv-s{color:#f0c060}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{font-family:'Trebuchet MS',Arial,sans-serif;font-size:13px;font-weight:700;padding:10px 18px;border-radius:10px;border:1px solid #1a2535;background:transparent;color:#5a7a9a;cursor:pointer}
+.tab.on{background:rgba(74,240,176,.1);border-color:#4af0b0;color:#4af0b0}
+.prog-wrap{margin-bottom:12px}
+.prog-label{font-family:'Trebuchet MS',Arial,sans-serif;font-size:11px;color:#5a7a9a;display:flex;justify-content:space-between;margin-bottom:4px}
+.prog-bar{height:4px;background:#1a2535;border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#4af0b0,#60b0f0);border-radius:99px;transition:.4s}
+.card{background:rgba(255,255,255,.03);border:1px solid #1a2535;border-radius:18px;padding:20px 16px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.card-title{font-family:'Trebuchet MS',Arial,sans-serif;font-size:17px;font-weight:700;line-height:1.3;margin-bottom:12px}
+.card-desc{color:#8aaaBc;font-style:italic;font-size:15px;line-height:1.55;margin-bottom:18px;border-left:2px solid #1a2535;padding-left:12px}
+.options{display:grid;gap:10px;margin-bottom:16px}
+.opt{width:100%;background:rgba(255,255,255,.025);border:2px solid #1a2535;border-radius:12px;padding:14px 15px;cursor:pointer;font-size:15px;font-family:Georgia,serif;color:#d4e4f7;text-align:left;line-height:1.4;-webkit-tap-highlight-color:rgba(74,240,176,.2);transition:border-color .15s}
+.opt:active,.opt:focus{background:rgba(74,240,176,.06);border-color:#4af0b0;outline:none}
+.opt.ok{border-color:#4af0b0;background:rgba(74,240,176,.09)}
+.opt.bad{border-color:#f07080;background:rgba(240,112,128,.07)}
+.fb{border:1px solid #1a2535;border-radius:12px;padding:13px 15px;font-size:15px;line-height:1.5;margin-bottom:14px;min-height:50px;color:#5a7a9a}
+.fb-ok{border-color:rgba(74,240,176,.4);color:#4af0b0}
+.fb-bad{border-color:rgba(240,112,128,.35);color:#f07080}
+.fb-hint{border-color:rgba(240,192,96,.35);color:#f0c060}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.btn{font-family:'Trebuchet MS',Arial,sans-serif;font-size:12px;font-weight:700;padding:11px 16px;border-radius:10px;cursor:pointer;letter-spacing:.3px}
+.btn-main{background:linear-gradient(135deg,#4af0b0,#30c890);color:#041a0f;border:none}
+.btn-main:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid #1a2535;color:#8aaBcc}
+.btn-reset{font-family:'Trebuchet MS',Arial,sans-serif;font-size:11px;padding:8px 12px;border-radius:8px;border:1px solid #1a2535;background:transparent;color:#5a7a9a;cursor:pointer}
+.finish{text-align:center;padding:10px 0 20px}
+.finish-title{font-family:'Trebuchet MS',Arial,sans-serif;font-size:26px;font-weight:900;background:linear-gradient(135deg,#4af0b0,#f0c060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.stat{background:#0c1018;border:1px solid #1a2535;border-radius:12px;padding:14px;text-align:center}
+.stat-num{font-family:'Trebuchet MS',Arial,sans-serif;font-size:30px;font-weight:900}
+.stat-lbl{font-size:12px;color:#5a7a9a;margin-top:2px}
+.finish-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.center-msg{text-align:center;padding:30px 10px}
+@media(max-width:400px){.hud{grid-template-columns:1fr 1fr}.chip-val{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div>
+      <div class="logo">Kingdom Logic</div>
+      <div class="logo-sub">Інтелект · Чіткість · Доброта · Залізна логіка · Життя тут і зараз</div>
+    </div>
+    <button class="btn-reset" onclick="resetGame()">&#8634; Скинути</button>
+  </div>
+  <div class="hud">
+    <div class="chip"><div class="chip-label">Логіка</div><div class="chip-val cv-l" id="hL">0</div></div>
+    <div class="chip"><div class="chip-label">Серце</div><div class="chip-val cv-h" id="hH">0</div></div>
+    <div class="chip"><div class="chip-label">Ясність</div><div class="chip-val cv-c" id="hC">0</div></div>
+    <div class="chip"><div class="chip-label">Streak</div><div class="chip-val cv-s" id="hS">0</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" id="tStory" onclick="setMode('story')">&#127749; Сюжет</button>
+    <button class="tab" id="tDaily" onclick="setMode('daily')">&#9889; Щодня</button>
+  </div>
+  <div id="gameArea">Завантаження...</div>
+</div>
+<script>
+var STORY=[
+{id:'L1',k:'LOGIC',title:'Модус толленс: відсікти зайве',desc:'Якщо правда — людина не боїться перевірки. Петро боїться перевірки. Який строгий висновок?',hint:'A то B. Якщо не-B, то не-A. Це залізний закон логіки.',opts:[{t:'Петро говорить правду.',ok:0,w:'З умови це не випливає — навпаки.'},{t:'Петро НЕ говорить правду.',ok:1,w:'Якщо правда означає "не боїться", а він боїться — він поза множиною правди.'},{t:'Перевірка не має значення.',ok:0,w:'Не пов\'язано з логікою умови.'}],reward:{logic:2,clarity:1}},
+{id:'L2',k:'LOGIC',title:'Умова і наслідок',desc:'Правило: якщо натиснути A — двері відкриються. Двері НЕ відкрились. Що точно можна сказати?',hint:'Якщо A веде до Open, а Open = false, то A = false.',opts:[{t:'Кнопку A точно НЕ натискали.',ok:1,w:'За строгим правилом: якщо A — то відчинено. Не відчинено — значить A не натискали.'},{t:'Двері зламані.',ok:0,w:'Можливо, але це не строгий висновок з умови.'},{t:'Нічого не можна сказати.',ok:0,w:'Строга логіка дозволяє зробити висновок.'}],reward:{logic:2,clarity:1}},
+{id:'L3',k:'LOGIC',title:'Хибна дилема',desc:'Хтось каже: "Або ти повністю зі мною, або ти ворог". Яка помилка мислення?',hint:'Коли залишають лише 2 варіанти, хоча їх набагато більше.',opts:[{t:'Хибна дилема (або-або).',ok:1,w:'Є безліч позицій: частково згоден, хочу уточнити, пропоную третій варіант.'},{t:'Апеляція до авторитету.',ok:0,w:'Тут не посилаються на авторитет.'},{t:'Після цього — значить через це.',ok:0,w:'Це про хибну причинність у часі, тут інше.'}],reward:{logic:2,clarity:2}},
+{id:'L4',k:'LOGIC',title:'Підміна тези',desc:'Тебе запитали: "Чи корисні ці ліки?" Ти відповів: "Лікарі — добрі люди". Що сталось?',hint:'Коли відповідь стосується не того, про що питали.',opts:[{t:'Аргумент до людини.',ok:0,w:'Це атака на особу, а не підміна теми.'},{t:'Підміна тези — відповідь не на те питання.',ok:1,w:'Ти замінив питання про ліки на тему про лікарів.'},{t:'Хибна аналогія.',ok:0,w:'Аналогії тут немає.'}],reward:{logic:2,clarity:1}},
+{id:'L5',k:'LOGIC',title:'Порочне коло',desc:'"Ця книга правдива, бо автор так написав. А автору можна вірити, бо книга правдива". Що це?',hint:'Коли аргумент доводить сам себе — без зовнішніх фактів.',opts:[{t:'Порочне коло — доказ містить те, що треба довести.',ok:1,w:'Виходу немає без зовнішнього факту. Це класична логічна пастка.'},{t:'Аргумент до більшості.',ok:0,w:'Тут немає посилання на більшість.'},{t:'Ефект ореолу.',ok:0,w:'Це психологічне явище, а не логічна помилка.'}],reward:{logic:2,clarity:2}},
+{id:'L6',k:'LOGIC',title:'Причина чи кореляція?',desc:'"Діти, які їдять сніданок, краще вчаться. Значить, сніданок робить розумнішими". Де помилка?',hint:'Два явища пов\'язані, але не обов\'язково одне спричиняє інше.',opts:[{t:'Ніяк: логіка правильна.',ok:0,w:'Ні — це помилка причинності.'},{t:'Кореляція не дорівнює причинності. Третій фактор може спричиняти обидва явища.',ok:1,w:'Порядок у сім\'ї може давати і сніданок, і гарне навчання.'},{t:'Апеляція до емоцій.',ok:0,w:'Тут немає маніпуляції через емоції.'}],reward:{logic:2,clarity:1}},
+{id:'L7',k:'LOGIC',title:'Узагальнення з одного випадку',desc:'"Я знаю чоловіка, який курив і прожив 90 років. Значить, куріння не шкодить". Помилка?',hint:'Один приклад не доводить правило для мільйонів.',opts:[{t:'Поспішне узагальнення — помилка вибірки.',ok:1,w:'Один випадок не скасовує статистику мільйонів.'},{t:'Хибна дилема.',ok:0,w:'Тут немає вибору між двома варіантами.'},{t:'Логіка правильна.',ok:0,w:'Ні, це класична помилка.'}],reward:{logic:2,clarity:1}},
+{id:'L8',k:'LOGIC',title:'Ковзання по слизькому схилу',desc:'"Якщо дозволити дітям пізно лягати, вони стануть безвідповідальними". Що не так?',hint:'Ланцюг наслідків без доказів кожного кроку.',opts:[{t:'Нічого — це реальний ризик.',ok:0,w:'Реальний ризик має бути доведений на кожному кроці.'},{t:'"Ковзкий схил": без доказів кожного кроку ланцюг розпадається.',ok:1,w:'Кожна ланка потребує окремого доказу. Без них — маніпуляція страхом.'},{t:'Хибна аналогія.',ok:0,w:'Аналогія тут не використовується.'}],reward:{logic:2,clarity:1}},
+{id:'L9',k:'LOGIC',title:'Аргумент до особи',desc:'"Ця ідея погана, бо запропонував її нечесна людина". Що не так?',hint:'Якість ідеї не залежить від якості людини.',opts:[{t:'Аргумент ad hominem — атака на особу замість ідеї.',ok:1,w:'Ідея може бути хорошою навіть від поганої людини. Треба аналізувати ідею, не автора.'},{t:'Підміна тези.',ok:0,w:'Підміни теми немає — мова про ту саму ідею.'},{t:'Апеляція до більшості.',ok:0,w:'Більшості тут немає.'}],reward:{logic:2,clarity:1}},
+{id:'L10',k:'LOGIC',title:'Правило дедукції',desc:'"Всі птахи вміють літати. Пінгвін — птах". Що логічно випливає?',hint:'Дедукція правильна за формою. Але перевір засновок!',opts:[{t:'Пінгвін вміє літати.',ok:0,w:'З цих засновків — так. Але перший засновок хибний, тому й висновок хибний.'},{t:'Висновок хибний, бо перший засновок "всі птахи літають" — хибний.',ok:1,w:'Дедукція правильна за формою, але хибна за змістом. Завжди перевіряй засновки!'},{t:'Пінгвін — не птах.',ok:0,w:'Пінгвін — птах, але засновок про всіх птахів хибний.'}],reward:{logic:3,clarity:2}},
+{id:'H1',k:'HEART',title:'Сила порядності',desc:'На зупинці знаходиш гаманець. Ніхто не бачить. Усередині — гроші й документи. Твій вибір.',hint:'Дивись на те, що будується всередині тебе.',opts:[{t:'Взяти й мовчати.',ok:0,w:'Короткий бонус. Але ти запускаєш механізм виправдання зла. Ясність падає.',fx:{heart:-1,clarity:-1}},{t:'Повернути спокійно, без зайвих слів.',ok:1,w:'Порядність як сила: не тому що боїшся, а тому що це твоя внутрішня правда.',fx:{heart:2,clarity:1}},{t:'Зробити вигляд, що не бачив.',ok:0,w:'Зовні нейтрально. Всередині — втеча від відповідальності.',fx:{clarity:-1}}],reward:{}},
+{id:'H2',k:'HEART',title:'Відповідь без хаосу',desc:'Тобі написали різко й несправедливо. Ти роздратований. Що робиш?',hint:'Сила — це не атака. Сила — це ясність у бурі.',opts:[{t:'Відповісти ще різкіше.',ok:0,w:'Хаос множиться. Тимчасове полегшення і довга шкода.',fx:{clarity:-1,heart:-1}},{t:'Пауза. Потім — спокійно і по суті.',ok:1,w:'Це справжня сила: ясність не руйнується від чужого хаосу.',fx:{heart:1,clarity:2}},{t:'Мовчати з образою всередині.',ok:0,w:'Тиша зовні, отрута всередині. Це не мир.',fx:{clarity:-1}}],reward:{}},
+{id:'H3',k:'HEART',title:'Правда, яка болить',desc:'Друг запитав думку про його проект. Проект слабкий. Як відповісти?',hint:'Брехня заради комфорту — це теж вибір. Але який?',opts:[{t:'Сказати "все чудово", щоб не засмучувати.',ok:0,w:'Ти захищаєш себе від незручності. Але позбавляєш друга шансу зрости.',fx:{clarity:-1}},{t:'Чесно назвати слабкі місця з повагою і конкретно.',ok:1,w:'Це доброта без брехні: повага до людини і до правди одночасно.',fx:{heart:2,clarity:1}},{t:'Сказати різко: "Це не працює".',ok:0,w:'Правда без турботи — це жорстокість, а не сила.',fx:{heart:-1}}],reward:{}},
+{id:'H4',k:'HEART',title:'Пробачити без умов',desc:'Людина, яка тебе образила, не вибачилась. Ти ще ображений. Що з пробаченням?',hint:'Пробачення — не для них. Для тебе.',opts:[{t:'Чекати, поки вибачаться.',ok:0,w:'Ти передаєш владу над своїм внутрішнім миром іншій людині.',fx:{clarity:-1}},{t:'Простити всередині: не заради них, а заради своєї свободи.',ok:1,w:'Пробачення — це не "вони праві". Це "я вільний від отрути образи".',fx:{heart:2,clarity:2}},{t:'Ігнорувати і не думати про це.',ok:0,w:'Ігнорування — не пробачення. Рана залишається.',fx:{clarity:-1}}],reward:{}},
+{id:'H5',k:'HEART',title:'Доброта без очікувань',desc:'Ти допоміг колезі. Він не подякував і навіть не помітив. Що відчуваєш?',hint:'Чому ти допомагав — заради подяки чи з внутрішнього вибору?',opts:[{t:'Образитись і більше не допомагати.',ok:0,w:'Значить, ти допомагав заради обміну, а не з доброти.',fx:{heart:-1,clarity:-1}},{t:'Відмітити це всередині, але не змінювати свого вибору.',ok:1,w:'Доброта без умов — це сила характеру, а не наївність.',fx:{heart:2,clarity:1}},{t:'Рахувати борги — хто що кому.',ok:0,w:'Бухгалтерія стосунків руйнує їхню глибину.',fx:{heart:-1}}],reward:{}},
+{id:'H6',k:'HEART',title:'Межі як повага',desc:'Тебе просять зробити щось проти твоїх цінностей. "Лише цього разу". Як?',hint:'"Ні" — це не ворожість. Це самоповага.',opts:[{t:'Погодитись, щоб не конфліктувати.',ok:0,w:'Ти обрав уникнення. Але ціну платиш ти.',fx:{clarity:-1,heart:-1}},{t:'Сказати "ні" спокійно і пояснити чому.',ok:1,w:'Межі зі спокоєм — це повага до себе і до іншого.',fx:{heart:2,clarity:1}},{t:'Вибухнути: "Завжди ви так!"',ok:0,w:'Емоція без ясності — це хаос, а не захист.',fx:{clarity:-2}}],reward:{}},
+{id:'H7',k:'HEART',title:'Слухати, не чекаючи черги',desc:'Людина розповідає тобі щось болюче. Ти вже знаєш "правильну відповідь". Що робиш?',hint:'Слухати — це активна дія, не пасивне очікування.',opts:[{t:'Перебити і дати пораду відразу.',ok:0,w:'Людина хотіла бути почутою. Ти дав їй інструкцію замість присутності.',fx:{heart:-1}},{t:'Спочатку почути до кінця, потім запитати — чи хочуть поради.',ok:1,w:'Справжня присутність — це подарунок. Часто людині потрібне саме це.',fx:{heart:2,clarity:1}},{t:'Розповісти про свою схожу ситуацію.',ok:0,w:'Ти перевів фокус на себе. Людина залишилась непочутою.',fx:{heart:-1,clarity:-1}}],reward:{}},
+{id:'H8',k:'HEART',title:'Відповідальність без самобичування',desc:'Ти зробив помилку і це вплинуло на інших. Що далі?',hint:'Відповідальність не дорівнює самознищенню. Це дія.',opts:[{t:'Думати: "Я жахлива людина".',ok:0,w:'Самобичування — тупик. Воно не виправляє помилку.',fx:{clarity:-2}},{t:'Визнати, вибачитись, виправити — і рухатись.',ok:1,w:'Відповідальність — це коли дія важливіша за почуття провини.',fx:{heart:2,clarity:2}},{t:'Заперечити і звинуватити обставини.',ok:0,w:'Заперечення руйнує довіру і ясність.',fx:{heart:-1,clarity:-1}}],reward:{}},
+{id:'H9',k:'HEART',title:'Заздрість або радість за іншого?',desc:'Колега отримав те, чого ти хотів. Тобі боляче. Що з цим?',hint:'Біль — нормальний. Питання: що ти з ним зробиш?',opts:[{t:'Умовно порадіти, а всередині злитись.',ok:0,w:'Маска без роботи всередині — самообман, що роз\'їдає.',fx:{clarity:-1}},{t:'Визнати біль, привітати щиро, знайти свій шлях.',ok:1,w:'Радість за іншого при власному болю — це зрілість серця.',fx:{heart:2,clarity:1}},{t:'Шукати причини, чому "вони не заслуговують".',ok:0,w:'Знецінення іншого не додає тобі нічого, крім гіркоти.',fx:{heart:-2,clarity:-1}}],reward:{}},
+{id:'H10',k:'HEART',title:'Допомогти незнайомому',desc:'Незнайомець на вулиці потребує допомоги. Ти поспішаєш. Що робиш?',hint:'"Тут і зараз" означає бачити реальність перед собою.',opts:[{t:'Пройти: "хтось інший допоможе".',ok:0,w:'Психологи називають це "ефект очевидця". Так ніхто й не допомагає.',fx:{heart:-1,clarity:-1}},{t:'Зупинитись і запитати що потрібно.',ok:1,w:'Присутність тут і зараз — це вибір бути живим, а не автоматом.',fx:{heart:3,clarity:1}},{t:'Засоромитись і пришвидшитись.',ok:0,w:'Сором без дії — це лише дискомфорт, а не мораль.',fx:{clarity:-1}}],reward:{}},
+{id:'V1',k:'LIFE',title:'Три хвилини світла',desc:'Ти втомився. День важкий. Рівень енергії — нуль. Що обираєш на 3 хвилини?',hint:'Малий реальний крок сьогодні змінює траєкторію.',opts:[{t:'Закритися і думати: "Все погано".',ok:0,w:'Це не чесність — це капітуляція хаосу.',fx:{clarity:-1}},{t:'Подяка за 3 речі + одна маленька добра дія.',ok:1,w:'Ти повертаєш фокус на реальне добро. Це дисципліна світла.',fx:{heart:1,clarity:2}},{t:'Зірватися на близьких.',ok:0,w:'Легше на 2 хвилини. Потім — хаос і провина.',fx:{heart:-1,clarity:-1}}],reward:{}},
+{id:'V2',k:'LIFE',title:'Сьогодні, не колись',desc:'Ти постійно відкладаєш щось важливе. Сьогодні знову є шанс почати. Що?',hint:'"Потім" не існує. Є лише "зараз".',opts:[{t:'Почекати "правильного моменту".',ok:0,w:'Правильний момент — вигадка мозку, який боїться.',fx:{clarity:-1}},{t:'Зробити один маленький крок зараз.',ok:1,w:'Один крок будує звичку. Звичка будує характер. Характер — долю.',fx:{clarity:2,logic:1}},{t:'Скласти план і нічого не зробити.',ok:0,w:'Планування без дії — це ілюзія руху.',fx:{clarity:-1}}],reward:{}},
+{id:'V3',k:'LIFE',title:'Краса буденного',desc:'Вранці п\'єш каву. Звичний момент. Чи можна знайти в ньому щось живе?',hint:'Справжнє життя — в малих моментах, а не тільки в "великих подіях".',opts:[{t:'Ні, це просто рутина.',ok:0,w:'Рутина — це те, чим ти наповнюєш її.',fx:{clarity:-1}},{t:'Зупинитись на 10 секунд і відчути: запах, тепло, тишу.',ok:1,w:'Присутність у малому — це практика вічності тут і зараз.',fx:{heart:1,clarity:2}},{t:'Краса лише у великих моментах.',ok:0,w:'Хто чекає великого — пропускає все.',fx:{clarity:-1}}],reward:{}},
+{id:'V4',k:'LIFE',title:'Страх vs Дія',desc:'Ти хочеш щось змінити у своєму житті, але страх паралізує. Що робиш?',hint:'Страх — сигнал, а не наказ.',opts:[{t:'Чекати, поки страх пройде сам.',ok:0,w:'Страх від бездії не зникає — він росте.',fx:{clarity:-1}},{t:'Зробити найменший крок попри страх.',ok:1,w:'Мужність — не відсутність страху. Це дія попри нього.',fx:{clarity:2,logic:1}},{t:'Уникати ситуації назавжди.',ok:0,w:'Уникнення звужує твій світ.',fx:{heart:-1,clarity:-1}}],reward:{}},
+{id:'V5',k:'LIFE',title:'Невдача як учитель',desc:'Ти зазнав серйозної невдачі. Боляче. Що з цим?',hint:'Невдача — не вирок. Це дані для росту.',opts:[{t:'Вирішити, що "я не здатний".',ok:0,w:'Один провал не дорівнює вироку про особистість.',fx:{clarity:-2,heart:-1}},{t:'Запитати: "Що це навчило мене? Що далі?"',ok:1,w:'Кожна невдача — це калібрування. Це і є розвиток.',fx:{clarity:2,logic:1}},{t:'Зробити вигляд, що нічого не було.',ok:0,w:'Ігнорування не вчить. Ти повторюватимеш те саме.',fx:{clarity:-1}}],reward:{}},
+{id:'V6',k:'LIFE',title:'Слово яке оживлює',desc:'Ти знаєш людину, яка зараз важко переживає. Що зробиш сьогодні?',hint:'Одне справжнє слово може змінити чийсь день.',opts:[{t:'Нічого — не моя справа.',ok:0,w:'Байдужість — це теж вибір.',fx:{heart:-1}},{t:'Написати або сказати одне тепле, конкретне слово.',ok:1,w:'"Ти справляєшся. Я поруч" — це може бути все, що потрібно.',fx:{heart:2,clarity:1}},{t:'Почекати, поки вони самі звернуться.',ok:0,w:'Іноді люди не звертаються — не тому що не потребують, а тому що соромляться.',fx:{clarity:-1}}],reward:{}},
+{id:'V7',k:'LIFE',title:'Тіло і розум',desc:'Ти давно нехтуєш сном, рухом, їжею. "Немає часу". Що насправді відбувається?',hint:'Тіло — це не автомобіль. Це ти сам.',opts:[{t:'Продовжувати ігнорувати — справи важливіші.',ok:0,w:'Вичерпаний ресурс дає менше, а не більше.',fx:{clarity:-1,heart:-1}},{t:'Один малий крок: 20 хв сну більше або 10 хв ходьби.',ok:1,w:'Маленька турбота про тіло — це повага до власного інструменту.',fx:{heart:1,clarity:2}},{t:'Чекати відпустки, щоб відновитись.',ok:0,w:'Відпустка не відновить те, що руйнується щодня.',fx:{clarity:-1}}],reward:{}},
+{id:'V8',k:'LIFE',title:'Самотність і тиша',desc:'Ти наодинці. Тиша. Без телефону. Що з цим?',hint:'Тиша — це не порожнеча. Це простір для себе.',opts:[{t:'Одразу ввімкнути щось — тільки б не думати.',ok:0,w:'Втеча від тиші означає втечу від себе.',fx:{clarity:-1}},{t:'Побути з собою: подумати, відчути, осмислити.',ok:1,w:'Тиша — це де відбуваються найважливіші відкриття.',fx:{clarity:2,heart:1}},{t:'Відчути тривогу — щось не так без шуму.',ok:0,w:'Тривога від тиші — сигнал познайомитись з собою ближче.',fx:{clarity:-1}}],reward:{}},
+{id:'V9',k:'LIFE',title:'Мета і щоденність',desc:'У тебе є велика мета. Але сьогодні — звичайний буденний день. Який зв\'язок?',hint:'Великий шлях складається лише з маленьких кроків.',opts:[{t:'Велика мета не має відношення до буднів.',ok:0,w:'Тоді велика мета — мрія без основи.',fx:{clarity:-1}},{t:'Знайти один маленький крок сьогодні у напрямку мети.',ok:1,w:'Мета живе в щоденних виборах. Це і є шлях.',fx:{clarity:2,logic:1}},{t:'Чекати "правильного дня" для дій.',ok:0,w:'Правильний день — сьогодні.',fx:{clarity:-1}}],reward:{}},
+{id:'V10',k:'LIFE',title:'Вдячність без умов',desc:'Твоє життя зараз не ідеальне. Чи можна бути вдячним?',hint:'Вдячність — не про умови. Це про фокус уваги.',opts:[{t:'Ні — спочатку нехай стане краще.',ok:0,w:'Тоді вдячність ніколи не прийде: умови змінюються, фокус — ні.',fx:{clarity:-1}},{t:'Так: знайти 3 реальних речі, за які вдячний зараз.',ok:1,w:'Вдячність тренує мозок бачити добро. Це наука, а не романтика.',fx:{heart:2,clarity:2}},{t:'Це самообман — реальність важка.',ok:0,w:'Визнавати труднощі і бачити добро — не суперечать одне одному.',fx:{clarity:-1}}],reward:{}}
+];
+var DAILY=[
+{id:'D1',k:'DAILY',title:'Щоденна логіка',desc:'A веде до B. B = false. Що точно можна сказати про A?',hint:'Якщо A то B, і B не відбулось — A теж не було.',opts:[{t:'A = true',ok:0,w:'Ні, за строгою логікою — навпаки.'},{t:'A = false',ok:1,w:'Якщо A веде до B, і B не відбулось — значить A не було.'},{t:'Нічого сказати не можна',ok:0,w:'У строгій логіці — можна.'}],reward:{logic:1,clarity:1}},
+{id:'D2',k:'DAILY',title:'Щоденне серце',desc:'Хтось написав тобі різко. Перша реакція — злість. Що далі?',hint:'Пауза перед відповіддю — це сила, не слабкість.',opts:[{t:'Відповісти відразу різко',ok:0,w:'Хаос множиться.',fx:{clarity:-1}},{t:'Пауза — потім відповідь по суті спокійно',ok:1,w:'Ясність у бурі — ознака зрілості.',fx:{heart:1,clarity:1}},{t:'Мовчати з образою',ok:0,w:'Тиша з отрутою всередині — це не мир.',fx:{clarity:-1}}],reward:{}},
+{id:'D3',k:'DAILY',title:'Мікрокрок зараз',desc:'Обери дію на найближчі 3 хвилини.',hint:'Один маленький крок сьогодні змінює день.',opts:[{t:'Стрічка ще 20 хвилин',ok:0,w:'Це краде ясність і час.',fx:{clarity:-1}},{t:'Вода + 5 вдихів + одне тепле слово комусь',ok:1,w:'Ти повертаєш себе в тіло і в стосунки.',fx:{heart:1,clarity:1}},{t:'Накрутити думки "а що якщо"',ok:0,w:'Тривога без дії — це туман.',fx:{clarity:-1}}],reward:{}}
+];
+var st={logic:0,heart:0,clarity:0,dailyStreak:0,dailyLast:null,seen:{}};
+try{var _r=localStorage.getItem('kl4');if(_r){var _p=JSON.parse(_r);st={logic:_p.logic||0,heart:_p.heart||0,clarity:_p.clarity||0,dailyStreak:_p.dailyStreak||0,dailyLast:_p.dailyLast||null,seen:_p.seen||{}};}}catch(e){}
+
+function save(){try{localStorage.setItem('kl4',JSON.stringify(st));}catch(e){}}
+function pad(n){return n<10?'0'+n:''+n;}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function shuffle(a){var r=a.slice(),i=r.length,j,t;while(i--){j=Math.floor(Math.random()*(i+1));t=r[i];r[i]=r[j];r[j]=t;}return r;}
+function ap(d){if(!d)return;if(d.logic)st.logic=Math.max(0,(st.logic||0)+(d.logic));if(d.heart)st.heart=Math.max(0,(st.heart||0)+(d.heart));if(d.clarity)st.clarity=Math.max(0,(st.clarity||0)+(d.clarity));}
+function hud(){document.getElementById('hL').textContent=st.logic;document.getElementById('hH').textContent=st.heart;document.getElementById('hC').textContent=st.clarity;document.getElementById('hS').textContent=st.dailyStreak;}
+
+var mode='story',pack=[],idx=0,cur=null,chosen=-1;
+
+function setMode(m){
+  mode=m;
+  document.getElementById('tStory').className='tab'+(m==='story'?' on':'');
+  document.getElementById('tDaily').className='tab'+(m==='daily'?' on':'');
+  if(m==='story')bootStory();else bootDaily();
+}
+
+function bootStory(){
+  pack=[];
+  for(var i=0;i<STORY.length;i++){if(!st.seen[STORY[i].id])pack.push(STORY[i]);}
+  idx=0;
+  if(!pack.length){showFinish();return;}
+  showCard();
+}
+
+function bootDaily(){
+  var t=todayISO();
+  if(st.dailyLast===t){showDailyDone();return;}
+  var y=new Date(new Date(t).getTime()-86400000);
+  var yISO=y.getFullYear()+'-'+pad(y.getMonth()+1)+'-'+pad(y.getDate());
+  st.dailyStreak=(st.dailyLast===yISO)?(st.dailyStreak||0)+1:1;
+  st.dailyLast=t;save();
+  pack=shuffle(DAILY).slice(0,3);idx=0;showCard();
+}
+
+function showCard(){
+  cur=pack[idx]||null;chosen=-1;
+  if(!cur){if(mode==='daily')showDailyDone();else showFinish();return;}
+  hud();
+  var total=pack.length;
+  var pct=Math.round(idx/total*100);
+  var sDone=Object.keys(st.seen).length;
+  var sPct=Math.round(sDone/STORY.length*100);
+  var html='';
+  if(mode==='story'){html+='<div class="prog-wrap"><div class="prog-label"><span>Загальний прогрес</span><span>'+sDone+' / '+STORY.length+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+sPct+'%"></div></div></div>';}
+  html+='<div class="prog-wrap"><div class="prog-label"><span>Місія '+(idx+1)+' / '+total+'</span><span style="font-size:10px;color:#5a7a9a">'+cur.k+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
+  html+='<div class="card">';
+  html+='<div class="card-title">'+cur.title+'</div>';
+  html+='<div class="card-desc">'+cur.desc+'</div>';
+  html+='<div class="options">';
+  for(var i=0;i<cur.opts.length;i++){html+='<button class="opt" id="o'+i+'" onclick="pick('+i+')">'+cur.opts[i].t+'</button>';}
+  html+='</div>';
+  html+='<div class="fb" id="fb">Натисни варіант &#8595;</div>';
+  html+='<div class="actions">';
+  html+='<button class="btn btn-ghost" onclick="showHint()">Підказка</button>';
+  html+='<button class="btn btn-ghost" onclick="doShare()">Поділитись</button>';
+  html+='<button class="btn btn-main" id="btnN" onclick="advance()" disabled>Далі &#8594;</button>';
+  html+='</div></div>';
+  document.getElementById('gameArea').innerHTML=html;
+}
+
+function pick(i){
+  chosen=i;var opt=cur.opts[i];
+  for(var j=0;j<cur.opts.length;j++){var el=document.getElementById('o'+j);if(el)el.className='opt'+(j===i?(opt.ok?' ok':' bad'):'');}
+  if(opt.fx){ap(opt.fx);hud();save();}
+  var fb=document.getElementById('fb');
+  if(fb){fb.className='fb '+(opt.ok?'fb-ok':'fb-bad');fb.textContent=opt.w;}
+  var btn=document.getElementById('btnN');if(btn)btn.disabled=!opt.ok;
+}
+
+function showHint(){var fb=document.getElementById('fb');if(fb&&cur){fb.className='fb fb-hint';fb.textContent='Підказка: '+cur.hint;}}
+
+function doShare(){
+  var txt='Kingdom Logic: Логіка '+st.logic+' | Серце '+st.heart+' | Ясність '+st.clarity+' | Streak '+st.dailyStreak;
+  try{if(navigator.share){navigator.share({title:'Kingdom Logic',text:txt});return;}if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){alert('Скопійовано!');});return;}}catch(e){}
+  prompt('Скопіюй:',txt);
+}
+
+function advance(){
+  if(chosen<0||!cur.opts[chosen].ok)return;
+  var opt=cur.opts[chosen];
+  if(cur.reward)ap(cur.reward);
+  if(mode==='story')st.seen[cur.id]=true;
+  hud();save();idx++;showCard();
+}
+
+function showFinish(){
+  hud();
+  var html='<div class="card"><div class="finish">';
+  html+='<div style="font-size:48px;margin-bottom:10px">&#128081;</div>';
+  html+='<div class="finish-title">Шлях пройдено!</div>';
+  html+='<p style="color:#5a7a9a;font-style:italic;margin-bottom:16px">Ти пройшов усі 30 місій. Практика — в реальному житті.</p>';
+  html+='<div class="stats">';
+  html+='<div class="stat"><div class="stat-num cv-l">'+st.logic+'</div><div class="stat-lbl">Логіка</div></div>';
+  html+='<div class="stat"><div class="stat-num cv-h">'+st.heart+'</div><div class="stat-lbl">Серце</div></div>';
+  html+='<div class="stat"><div class="stat-num cv-c">'+st.clarity+'</div><div class="stat-lbl">Ясність</div></div>';
+  html+='<div class="stat"><div class="stat-num cv-s">'+st.dailyStreak+'</div><div class="stat-lbl">Streak</div></div>';
+  html+='</div>';
+  html+='<div class="finish-btns">';
+  html+='<button class="btn btn-ghost" onclick="setMode(\'daily\')">&#9889; Щодня</button>';
+  html+='<button class="btn btn-main" onclick="doShare()">Поділитись</button>';
+  html+='</div></div></div>';
+  document.getElementById('gameArea').innerHTML=html;
+}
+
+function showDailyDone(){
+  var html='<div class="card"><div class="center-msg">';
+  html+='<div style="font-size:42px;margin-bottom:10px">&#9989;</div>';
+  html+='<h2 style="color:#4af0b0;font-family:Trebuchet MS,Arial,sans-serif">Вже зроблено сьогодні!</h2>';
+  html+='<p style="color:#5a7a9a;margin:8px 0 20px">Серія: <b style="color:#f0c060">'+st.dailyStreak+'</b> днів. Повернись завтра.</p>';
+  html+='<button class="btn btn-main" onclick="setMode(\'story\')">До сюжету</button>';
+  html+='</div></div>';
+  document.getElementById('gameArea').innerHTML=html;
+}
+
+function resetGame(){
+  if(!confirm('Скинути весь прогрес?'))return;
+  st={logic:0,heart:0,clarity:0,dailyStreak:0,dailyLast:null,seen:{}};
+  save();hud();setMode('story');
+}
+
+hud();setMode('story');
+</script>
+</body>
+</html>
